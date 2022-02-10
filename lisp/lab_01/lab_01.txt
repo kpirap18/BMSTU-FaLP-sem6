@@ -1,0 +1,62 @@
+№1
+'(open close halph)
+'((open1) (close2) (halph3))
+'((one) for all (and (me (for you))))
+'((TOOL) (call))
+'((TOOL1) ((call2)) ((sell)))
+'(((TOOL) (call)) ((sell)))
+
+
+
+№2
+
+1) Второй
+
+2) Третий
+
+3) Четвертый
+
+
+№3
+1 -- (CAADR '((blue cube) (red pyramid)))
+2 -- (CDAR '((abc) (def) (ghi)))
+3 -- (CADR '((abc) (def) (ghi)))
+4 -- (CADDR '((abc) (def) (ghi)))
+
+№4
+(list 'Fred 'and 'Wilma) -> (Fred and Wilma)
+(list 'Fred '(and Wilma)) -> (Fred (and Wilma))
+(cons Nil Nil) -> (Nil)
+(cons T Nil) -> (T)
+(cons Nil T) -> (Nil . T)
+(cons t t) -> (T . T)
+(cons t (list t)) -> (T T)
+(list Nil) -> (Nil)
+(cons '(T) Nil) -> ((T))
+(list '(one two) '(free temp)) -> ((one two) (free temp))
+(cons 'Fred '(and Wilma)) -> (fred and Wilma)
+(cons 'Fred '(Wilma)) -> (Fred Wilma)
+(list Nil Nil) -> (Nil Nil)
+(list T Nil) -> (T Nil)
+(list Nil T) -> (Nil T)
+(cons T (list Nil)) -> (T Nil)
+(list '(T) Nil) -> ((T) Nil)
+(cons '(one two) '(free temp)) -> ((one two) free temp)
+
+№5
+
+-- Написать функцию (f ar1 ar2 ar3 ar4), возвращающую список: ((ar1 ar2) (ar3 ar4))
+(defun f1 (ar1 ar2 ar3 ar4)
+ (list (list ar1 ar2) (list ar3 ar4))
+)
+
+-- Написать функцию (f ar1 ar2), возвращающую ((ar1) (ar2))
+(defun f2 (ar1 ar2)
+ (list (list ar1) (list ar2))
+)
+
+-- Написать функцию (f ar1), возвращающую (((ar1)))
+(defun f3 (ar1)
+ (list (list (list ar1)))
+)
+
