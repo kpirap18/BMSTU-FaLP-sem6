@@ -1,0 +1,11 @@
+; № 4
+(defun play()
+	(setq score1 (+ (random 6)))
+	(setq score2 (+ (random 6)))
+	(setq cur_sum (+ score1 score2))
+	(cond ((or (= cur_sum 7) (= cur_sum 11)) 100)
+		  ((or (= score1 score2 1) (= score1 score2 6))
+				(and (print "another try") (play)))
+		  (T cur_sum)
+	)
+)
