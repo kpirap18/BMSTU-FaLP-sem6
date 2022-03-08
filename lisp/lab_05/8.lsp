@@ -25,10 +25,16 @@
 ;;;;;;;;;;;;;;;;;;;
 (defun f (lst num)
 	(cond ((null lst) ())
-          ((numberp (car lst))  (cons (* num (car lst)) (cdr lst))) 
-          ((symbolp (car lst)) (cons (car lst) (f (cdr lst) num))) ;; если это символ 
-          ((listp (car lst)) (cons (f (car lst) num)  (f (cdr lst) num) ))    
-    ) 
+          ((numberp lst)  (* num lst)) 
+          ((atom lst) lst) 
+          (T (let ((buf (f (car lst) num)))
+                  (if (my-equal (car lst) buf) 
+                        (cons (car lst) (f (cdr lst) num)) 
+                        (cons buf (cdr lst))
+                  )
+              )
+          )
+      ) 
 )
  ;;; 
 (defun f2 (num lst res)

@@ -26,6 +26,14 @@
 	lst
 )
 
+(defun set-element2 (new old lst)
+	(loop 
+	for i in lst 
+	do (cond ((= (car lst) old) (rplaca lst new))
+		  (t (set-element new old (cdr lst)))))
+	lst
+)
+
 
 (defun my-sort (lst)
 	(maplist #'(lambda (x)
