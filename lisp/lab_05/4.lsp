@@ -1,3 +1,14 @@
+(defun my-last (lst)
+	(cond ((null (cdr lst)) lst)
+		  (t (my-last (cdr lst)))
+	)
+)
+
+(DEFUN MY-APPEND (LST1 LST2)
+    (cond ( (ATOM LST1) LST2 )
+        (T ( CONS (CAR LST1) (MY-APPEND (CDR LST1) LST2) ))
+    )
+)
 
 
 (defun find-capital (table country)
@@ -54,3 +65,22 @@
 	
 (defun find-country (key table)
 	(car (rassoc key table)))
+
+
+
+;===============
+(defun without-last (lst)
+	(cond ((null (cdr lst)) nil)
+		  ((null (cddr lst))(cons (car lst) Nil))
+		  (t (my-append (cons (car lst) Nil) (without-last (cdr lst))))
+	)
+)
+
+(defun swap-first-last (lst)
+	(cond ((null (cdr lst)) lst)
+		  (t (my-append (my-last lst) 
+			      (my-append (without-last (cdr lst))
+				  (cons (car lst) Nil))))
+	)
+)
+
