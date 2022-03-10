@@ -3,12 +3,22 @@
 (defun find-capital (table country)
 	(cond ((null table) Nil)
 		((eq (caar table) country) (cdar table)) 
-		(T (find-capital (cdr table) country))) )
+		((eq (caadr table) country) (cdadr table)) 
+		((eq (caaddr table) country) (cdaddr table)) 
+		((eq (caadddr table) country) (cdadddr table)) 
+		(T Nil) ))
 
 (defun find-country (table capital)
 	(cond ((null table) Nil)
-		((eq (cdar table) capital) (caar table)) 
-		(T (find-country (cdr table) capital))) )
+		((eql (cdar table) capital) (caar table)) 
+		((eql (cdadr table) capital) (caadr table)) 
+		((eql (cdaddr table) capital) (caaddr table)) 
+		((eql (cdadddr table) capital) (caadddr table))  )
+
+(find-capital 
+    '((Russia . Moscow)
+    (Spain . Madrid)
+    (France . Paris)) 'Russia) ;; MOSCOW
 
 (find-capital 
     '((Russia . Moscow)
@@ -16,12 +26,31 @@
     (France . Paris)) 'Russia) ;; MOSCOW
 
 
-(defun find-country (table capital)
-	(cond ((null table) Nil)
-		((eq (cdar table) capital) (caar table)) 
-		(T (find-country (cdr table) capital))) )
+(assoc 'Russia '((Russia . Moscow) (Spain . Madrid) (France . Paris))) ;; MOSCOW
+(rassoc 'Spain '((Russia . Moscow) (Spain . Madrid) (France . Paris))) ;; MOSCOW
+; ----------------
 
-(find-capital 
-    '((Russia . Moscow)
-    (Spain . Madrid)
-    (France . Paris)) 'Russia) ;; MOSCOW
+; сразу возвращают страну или столицу
+; столицу
+(defun my-assoc (key table)
+	(cond ((null table) nil)
+		  ((if (equal key (caar table))
+				(cdar table)
+				(my-assoc key (cdr table))))
+	)
+)
+
+; страну
+(defun my-rassoc (val table)
+	(cond ((null table) nil)
+		  ((equal val (cdar table)) (caar table))
+		  (T (my-rassoc val (cdr table)))
+	)
+)
+
+; с помощью стандартных функций
+(defun find-capital (key table)
+	(cdr (assoc key table)))
+	
+(defun find-country (key table)
+	(car (rassoc key table)))

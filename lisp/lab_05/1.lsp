@@ -29,3 +29,9 @@
 (defun is-palindrome-2 (lst)
 	(equalp lst (reverse lst))
 )
+
+
+;----------------------
+
+
+

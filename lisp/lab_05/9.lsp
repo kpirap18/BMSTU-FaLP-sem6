@@ -3,12 +3,11 @@
 ;; возвращает их в виде списка (упорядоченного по возрастанию списка чисел (+ 2 балла))
 
 
-(defun find-elements (lst a b)
-    (loop
-    for i in lst
-        if (<= a i b) 
-            collect i into res
-    finally (return (values res)))
+(defun find-elements (lst left right)
+	(remove-if #'(lambda (x) (null x))
+					(mapcar #'(lambda (x)
+								(if (< left x right)
+									x)) lst))
 )
 
 
