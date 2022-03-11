@@ -8,9 +8,12 @@
 			lst)
 )
 
-(defun f (lst num)
-	(cond ((null lst) ())
-	(T (cons (- (car lst) 10) (f (cdr lst) num))) ) )
+(defun f (lst res)
+	(cond ((null lst) (reverse res))
+	(T (f (cdr lst) (cons (- (car lst) 10) res))) ) )
+
+(defun my-minus (lst)
+    (f lst ()))
 
 ; структурированный список
 (defun minus-d-all (lst)
@@ -21,12 +24,6 @@
 	lst)
 )
 
-; (defun minus-objects (mp lst)
-;     (reduce
-;         #'(lambda (acc el)
-;             (if (numberp el) (- el 10) acc))
-;     lst :initial-value mp)
-	
 (defun f (lst num)
 	(cond ((null lst) ())
 	((symbolp (car lst)) (cons (car lst) (f (cdr lst) num)))
@@ -36,47 +33,39 @@
 ; 2. Напишите функцию, которая умножает на заданное число-аргумент все числа 
 ; из заданного списка-аргумента, когда 
 ; a) все элементы списка -- числа,
+; только числа
 (defun mult (lst n)
 	(mapcar #'(lambda (x) (* x n))
 			lst)
 )
-
-; (defun mult-numbers (acc lst)
-;     (reduce #'* lst :initial-value acc)
-; 	lst
-; )
-
+; одноур. список
+(defun mult-els (lst num)
+    (mapcar #'(lambda (arg)
+        (cond ((numberp arg) (* arg num))
+                (t arg))) lst)) 
+; рекурсивно 
+(defun mult-els-rec (lst num res)
+    (cond 
+        ((null lst) (reverse res))
+        ((numberp (car lst)) (mult-els-rec (cdr lst) num (cons (* (car lst) num) res)))
+        (t (mult-els-rec (cdr lst) num (cons (car lst) res)))))
 (defun f (lst num)
-	(cond ((null lst) ())
-	(T (cons (* num (car lst)) (f (cdr lst) num))) ) ) 
-	
+    (mult-els-rec lst num ()))
+
 ; б) элементы списка -- любые объекты
 (defun mult-all (lst n)
-	(mapcar #'(lambda (x) 
-				(cond ((numberp x)(* x n))
-					  ((listp x)(mult-all x n))
-					  (t x)))
-			  lst)
-)
+    (mapcar #'(lambda (x) 
+            (cond ((numberp x)(* x n))
+                ((listp x)(mult-all x n))
+                (t x))) lst))
 
-; без накопления cons
-(defun mult-all-4 (num lst res)
-	(cond	((null lst) res)
-			((listp (car lst))(cons (mult-all-4 num (car lst) res) res))
-			((numberp (car lst))(cons (cons (car lst) res) (mult-all-4 num (cdr lst) res)))
-	)
-)
-
-(defun mult-all-3 (num lst)
-	(mult-all-4 num lst Nil)
-)
-
-; рекурсия
-(defun f (lst num)
-	(cond ((null lst) ())
-	((symbolp (car lst)) (cons (car lst) (f (cdr lst) num)))
-	((listp (car lst)) (cons (f (car lst) num) (f (cdr lst) num)))
-	(T (cons (* num (car lst)) (f (cdr lst) num))) ) )
+; рекурсия &&&&&&&&&&&&&
+(defun mult-els-rec-deep (lst num)
+    (cond
+        ((null lst) nil)
+        ((numberp (car lst)) (cons (* (car lst) num) (mult-els-rec-deep (cdr lst) num)))
+        ((listp (car lst)) (cons (mult-els-rec-deep (car lst) num) (mult-els-rec-deep (cdr lst) num)))
+        (t (cons (car lst) (mult-els-rec-deep (cdr lst) num)))))
 
 ; 3. Написать функцию, которая по своему списку-аргументу lst определяет 
 ; является ли он палиндромом (то есть равны ли lst и (reverse lst)).
@@ -144,6 +133,8 @@
 		((symbolp (car lst)) (get-sqr-list (cdr lst) (cons (car lst) res)))
         ((numberp (car lst)) (get-sqr-list (cdr lst) (cons (* (car lst) (car lst)) res)))))
 
+(defun get-sqr (lst)
+    (get-sqr-list (lst ())))
 ; c функционалами
 (defun get-sqr-helper (el)
     (cond
@@ -154,7 +145,7 @@
 (defun get-sqr-list-fun (lst)
     (mapcan #'get-sqr-helper lst))
 
-; Рекурсивно для смешанного структурированного списка
+; Рекурсивно для смешанного структурированного списка &&&&&&&&&&&&
 (defun get-sqr-list (lst)
     (cond 
         ((null lst) nil)
@@ -191,11 +182,11 @@
     )
 )
 
-;-------
-; (defun find-elements (lst left right)
-; 	(remove-if #'(lambda (x) (null x))
-; 		(mapcar #'(lambda (x) (if (< left x right) x)) lst))
-; )
+; -------
+(defun find-elements (lst left right)
+	(remove-if #'(lambda (x) (null x))
+		(mapcar #'(lambda (x) (if (< left x right) x)) lst))
+)
 
 
 ; (defun find-min (lst)
@@ -239,7 +230,7 @@
             (select-rec-one-lvl (cdr lst) a b (cons (car lst) res)))
         (t (select-rec-one-lvl (cdr lst) a b res))))
 
-; Рекурсивно. Для смешанного структурированного списка.
+; Рекурсивно. Для смешанного структурированного списка. &&&&&&&&&&&&
 (defun select-rec (lst a b res)
     (cond
         ((null lst) res)
@@ -287,7 +278,7 @@
 
 (defun decart (lst1 lst2 res)
     (cond ((null lst1) res)
-          (t (decart (cdr lst1) lst2 (cons (decart-rec (car lst1) lst2 ()) res)))))
+          (t (decart (cdr lst1) lst2 (decart-rec (car lst1) lst2 res)))))
 
 ; просто рекурсия 
 (defun decart-elem (lst elem)
@@ -308,6 +299,7 @@
 ; 9. Пусть list-of-list список, состоящий из списков. Написать функцию, которая 
 ; вычисляет сумму длин всех элементов list-of-list, т.е. например для аргумента  
 ; ((1 2) (3 4)) -> 4.
+
 (defun my-length-rec (lst n)
 	(cond 
 	((null lst) n)
@@ -320,7 +312,7 @@
 	(cond ((null lst) len)
 		  ((atom (car lst)) (list-of-list-rec (cdr lst) (+ len 1)))
 		  ((and (atom (caar lst)) (atom (cdar lst))) (list-of-list-rec (cdr lst) (+ len 2)))
-		  (T (list-of-list-rec (cdr lst) (+ len (length (car lst)) )))))
+		  (T (list-of-list-rec (cdr lst) (+ len (my-length (car lst)) )))))
 
 (defun list-of-list (lst)
 	(list-of-list-rec lst 0))

@@ -42,21 +42,22 @@
 \usepackage{xcolor}
 
 % Для листинга кода:
-\lstset{
-	basicstyle= \footnotesize,
-	breakatwhitespace=true,% разрыв строк только на whitespacce
-	breaklines=true,       % переносить длинные строки
-	%   captionpos=b,          % подписи снизу -- вроде не надо
-	inputencoding=koi8-r,
-	numbers=left,          % нумерация слева
-	numberstyle=\footnotesize,
-	showspaces=false,      % показывать пробелы подчеркиваниями -- идиотизм 70-х годов
+\lstset{%
+	language=python,   					% выбор языка для подсветки	
+	basicstyle=\footnotesize,			% размер и начертание шрифта для подсветки кода
+	numbers=left,						% где поставить нумерацию строк (слева\справа)
+	%numberstyle=,					% размер шрифта для номеров строк
+	stepnumber=1,						% размер шага между двумя номерами строк
+	numbersep=5pt,						% как далеко отстоят номера строк от подсвечиваемого кода
+	frame=single,						% рисовать рамку вокруг кода
+	tabsize=4,							% размер табуляции по умолчанию равен 4 пробелам
+	captionpos=t,						% позиция заголовка вверху [t] или внизу [b]
+	breaklines=true,					
+	breakatwhitespace=true,				% переносить строки только если есть пробел
+	escapeinside={\#*}{*)},				% если нужно добавить комментарии в коде
+	backgroundcolor=\color{white},
+	showspaces=false,
 	showstringspaces=false,
-	showtabs=false,        % и табы тоже
-	stepnumber=1,
-	tabsize=4,              % кому нужны табы по 8 символов?
-	frame=single,
-	escapeinside={(*}{*)}, %выделение
 	literate={а}{{\selectfont\char224}}1
 	{б}{{\selectfont\char225}}1
 	{в}{{\selectfont\char226}}1
@@ -124,6 +125,7 @@
 	{Ю}{{\selectfont\char222}}1
 	{Я}{{\selectfont\char223}}1
 }
+
 
 \usepackage{pgfplots}
 \usetikzlibrary{datavisualization}
