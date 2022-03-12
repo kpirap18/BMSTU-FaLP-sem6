@@ -3,70 +3,127 @@
 
 ; 1. Напишите функцию, которая уменьшает на 10 все числа из списка-аргумента этой функции
 ; одноуровневые список
+; только числа
 (defun minus-d (lst)
-	(mapcar #'(lambda (x) (- x 10))
-			lst)
-)
+	(mapcar #'(lambda (x) (- x 10)) lst))
 
+; смешанный список
+(defun minus-d (lst)
+	(mapcar #'(lambda (x) (cond ((numberp x) (- x 10)) (x))) lst))
+
+; рекурсия
+; только числа
 (defun f (lst res)
 	(cond ((null lst) (reverse res))
 	(T (f (cdr lst) (cons (- (car lst) 10) res))) ) )
+
+; смешанный список
+(defun f (lst res)
+	(cond ((null lst) (reverse res))
+          ((numberp (car lst)) (f (cdr lst) (cons (- (car lst) 10) res)))
+	(T (f (cdr lst) (cons (car lst) res))) ) )
 
 (defun my-minus (lst)
     (f lst ()))
 
 ; структурированный список
+; вспомогательная функция
+(defun dop-fun (lst)
+    (cond ((and (numberp (car lst)) (numberp (cdr lst))) (cons (- (car lst) 10) (- (cdr lst) 10)))
+          ((and (symbolp (car lst)) (numberp (cdr lst))) (cons (car lst) (- (cdr lst) 10)))
+          ((and (numberp (car lst)) (symbolp (cdr lst))) (cons (- (car lst) 10) (cdr lst)))
+          ((and (atom (cdar lst)) (numberp (cdr lst))) (cons (dop-fun (car lst)) (- (cdr lst) 10)))
+          ((and (atom (cdar lst)) (symbolp (cdr lst))) (cons (dop-fun (car lst)) (cdr lst)))
+          (T lst)))
+
+; функционал
 (defun minus-d-all (lst)
 	(mapcar #'(lambda (x) 
-				(cond ((numberp x)(- x 10))
-					  ((listp x)(minus-d-all x))
-					  (t x)))
-	lst)
-)
-
-(defun f (lst num)
+				(cond ((numberp x) (- x 10))
+                      ((atom x) x)
+                      ((atom (cdr x)) (dop-fun x))
+					  ((listp x) (minus-d-all x)))) lst))
+; рекурсия
+(defun f (lst)
 	(cond ((null lst) ())
-	((symbolp (car lst)) (cons (car lst) (f (cdr lst) num)))
-	((listp (car lst)) (cons (f (car lst) num) (f (cdr lst) num)))
-	(T (cons (- (car lst) 10) (f (cdr lst) num))) ) )
+	((symbolp (car lst)) (cons (car lst) (f (cdr lst))))
+	((numberp (car lst)) (cons (- (car lst) 10) (f (cdr lst))))
+	((atom (car lst)) (cons (car lst) (f (cdr lst) )))
+    ((atom (cdr lst)) (cons (dop-fun (car lst)) (f (cdr lst) )))
+	(T (cons (f (car lst)) (f (cdr lst))))) )
+
+; "хвостовая" рекурсия
+(defun f (lst res)
+	(cond ((null lst) (reverse res))
+	    ((symbolp (car lst)) (f (cdr lst) (cons (car lst) res)))
+	    ((numberp (car lst)) (f (cdr lst) (cons (- (car lst) 10) res)))
+        ((atom (car lst)) (f (cdr lst) (cons (car lst) res)))
+        ((atom (cdr lst)) (f (cdr lst) (cons (dop-fun (car lst)) res)))
+	    (T (f (cdr lst) (cons (f (csr lst) ()) res))) ) )
 	
 ; 2. Напишите функцию, которая умножает на заданное число-аргумент все числа 
 ; из заданного списка-аргумента, когда 
 ; a) все элементы списка -- числа,
+; одноуровневые список
 ; только числа
-(defun mult (lst n)
-	(mapcar #'(lambda (x) (* x n))
-			lst)
-)
-; одноур. список
-(defun mult-els (lst num)
-    (mapcar #'(lambda (arg)
-        (cond ((numberp arg) (* arg num))
-                (t arg))) lst)) 
-; рекурсивно 
-(defun mult-els-rec (lst num res)
-    (cond 
-        ((null lst) (reverse res))
-        ((numberp (car lst)) (mult-els-rec (cdr lst) num (cons (* (car lst) num) res)))
-        (t (mult-els-rec (cdr lst) num (cons (car lst) res)))))
-(defun f (lst num)
-    (mult-els-rec lst num ()))
+(defun mult-f (lst num)
+	(mapcar #'(lambda (x) (* x num)) lst))
 
-; б) элементы списка -- любые объекты
-(defun mult-all (lst n)
-    (mapcar #'(lambda (x) 
-            (cond ((numberp x)(* x n))
-                ((listp x)(mult-all x n))
-                (t x))) lst))
+; смешанный список
+(defun mult-f (lst num)
+	(mapcar #'(lambda (x) (cond ((numberp x) (* x num)) (x))) lst))
 
-; рекурсия &&&&&&&&&&&&&
-(defun mult-els-rec-deep (lst num)
-    (cond
-        ((null lst) nil)
-        ((numberp (car lst)) (cons (* (car lst) num) (mult-els-rec-deep (cdr lst) num)))
-        ((listp (car lst)) (cons (mult-els-rec-deep (car lst) num) (mult-els-rec-deep (cdr lst) num)))
-        (t (cons (car lst) (mult-els-rec-deep (cdr lst) num)))))
+; рекурсия
+; только числа
+(defun f (lst num res)
+	(cond ((null lst) (reverse res))
+	(T (f (cdr lst) (cons (* (car lst) num) res))) ) )
 
+; смешанный список
+(defun f (lst num res)
+	(cond ((null lst) (reverse res))
+          ((numberp (car lst)) (f (cdr lst) (cons (* (car lst) num) res)))
+	      (T (f (cdr lst) (cons (car lst) res))) ) )
+
+(defun my-mult (lst num)
+    (f lst num ()))
+
+; структурированный список
+; вспомогательная функция
+(defun dop-fun (lst num)
+    (cond ((and (numberp (car lst)) (numberp (cdr lst))) (cons (* (car lst) num) (* (cdr lst) num)))
+          ((and (symbolp (car lst)) (numberp (cdr lst))) (cons (car lst) (* (cdr lst) num)))
+          ((and (numberp (car lst)) (symbolp (cdr lst))) (cons (* (car lst) num) (cdr lst)))
+          ((and (atom (cdar lst)) (numberp (cdr lst))) (cons (dop-fun (car lst)) (* (cdr lst) num)))
+          ((and (atom (cdar lst)) (symbolp (cdr lst))) (cons (dop-fun (car lst)) (cdr lst)))
+          (T lst)))
+
+; функционал
+(defun mult-d-all (lst num)
+	(mapcar #'(lambda (x) 
+				(cond ((numberp x) (* x num))
+                      ((atom x) x)
+                      ((atom (cdr x)) (dop-fun x))
+					  ((listp x) (minus-d-all x)))) lst))
+; рекурсия
+(defun f (lst)
+	(cond ((null lst) ())
+	((symbolp (car lst)) (cons (car lst) (f (cdr lst))))
+	((numberp (car lst)) (cons (* (car lst) num) (f (cdr lst))))
+	((atom (car lst)) (cons (car lst) (f (cdr lst) )))
+    ((atom (cdr lst)) (cons (dop-fun (car lst)) (f (cdr lst) )))
+	(T (cons (f (car lst)) (f (cdr lst))))) )
+
+; "хвостовая" рекурсия
+(defun f (lst res)
+	(cond ((null lst) (reverse res))
+	    ((symbolp (car lst)) (f (cdr lst) (cons (car lst) res)))
+	    ((numberp (car lst)) (f (cdr lst) (cons (* (car lst) num) res)))
+        ((atom (car lst)) (f (cdr lst) (cons (car lst) res)))
+        ((atom (cdr lst)) (f (cdr lst) (cons (dop-fun (car lst)) res)))
+	    (T (f (cdr lst) (cons (f (csr lst) ()) res))) ) )
+
+    
 ; 3. Написать функцию, которая по своему списку-аргументу lst определяет 
 ; является ли он палиндромом (то есть равны ли lst и (reverse lst)).
 (defun palindrome-p (list)
@@ -83,7 +140,6 @@
 ; 4. Написать предикат set-equal, который возвращает t, если два его множества-аргумента
 ; содержат одни и те же элементы, порядок которых не имеет значения
 ; для одноуровнего списка
-
 ; функционал 
 (defun my-subsetp (set1 set2)
     (reduce
@@ -117,59 +173,70 @@
 
 ; 5. Написать функцию которая получает как аргумент список чисел, а возвращает 
 ; список квадратов этих чисел в том же порядке.
+; одноуровневые список
+; только числа
+(defun mult-f (lst)
+	(mapcar #'(lambda (x) (* x x)) lst))
 
-; одноуровневый список
-(defun get-sqr-list (lst)
-    (cond 
-        ((null lst) nil)
-		((symbolp (car lst)) (cons (car lst) (get-sqr-list (cdr lst))))
-        ((numberp (car lst)) (cons (* (car lst) (car lst)) (get-sqr-list (cdr lst))))
-        (t (get-sqr-list (cdr lst)))))
+; смешанный список
+(defun mult-f (lst)
+	(mapcar #'(lambda (x) (cond ((numberp x) (* x x)) (x))) lst))
 
-; рекурсия без накопления cons, но с reverse
-(defun get-sqr-list (lst res)
-    (cond 
-        ((null lst) (reverse res))
-		((symbolp (car lst)) (get-sqr-list (cdr lst) (cons (car lst) res)))
-        ((numberp (car lst)) (get-sqr-list (cdr lst) (cons (* (car lst) (car lst)) res)))))
+; рекурсия
+; только числа
+(defun f (lst res)
+	(cond ((null lst) (reverse res))
+	(T (f (cdr lst) (cons (* (car lst) (car lst)) res))) ) )
 
-(defun get-sqr (lst)
-    (get-sqr-list (lst ())))
-; c функционалами
-(defun get-sqr-helper (el)
-    (cond
-        ((numberp el) (cons (* el el) nil))
-		((symbolp el) (cons el nil))
-        (t nil)))
+; смешанный список
+(defun f (lst res)
+	(cond ((null lst) (reverse res))
+          ((numberp (car lst)) (f (cdr lst) (cons (* (car lst) (car lst)) res)))
+	      (T (f (cdr lst) (cons (car lst) res))) ) )
 
-(defun get-sqr-list-fun (lst)
-    (mapcan #'get-sqr-helper lst))
+(defun my-mult (lst num)
+    (f lst num ()))
 
-; Рекурсивно для смешанного структурированного списка &&&&&&&&&&&&
-(defun get-sqr-list (lst)
-    (cond 
-        ((null lst) nil)
-		((symbolp (car lst)) (cons (car lst) (get-sqr-list (cdr lst))))
-        ((listp (car lst)) (cons (get-sqr-list (car lst)) (get-sqr-list (cdr lst))))
-        ((numberp (car lst)) (cons (* (car lst) (car lst)) (get-sqr-list (cdr lst))))
-        (t (get-sqr-list (cdr lst)))))
+; структурированный список
+; вспомогательная функция
+(defun dop-fun (lst)
+    (cond ((and (numberp (car lst)) (numberp (cdr lst))) (cons (* (car lst) (car lst)) (* (cdr lst) (car lst))))
+          ((and (symbolp (car lst)) (numberp (cdr lst))) (cons (car lst) (* (cdr lst) (car lst))))
+          ((and (numberp (car lst)) (symbolp (cdr lst))) (cons (* (car lst) (car lst)) (cdr lst)))
+          ((and (atom (cdar lst)) (numberp (cdr lst))) (cons (dop-fun (car lst)) (* (cdr lst) (car lst))))
+          ((and (atom (cdar lst)) (symbolp (cdr lst))) (cons (dop-fun (car lst)) (cdr lst)))
+          (T lst)))
 
-; С использованием функционала для смешанного структурированного списка
-(defun get-sqr-helper (el)
-    (cond
-        ((listp el) (cons (get-sqr-list-fun el) nil))
-        ((numberp el) (cons (* el el) nil))
-		((symbolp el) (cons el nil))
-        (t nil)))
+; функционал
+(defun mult-d-all (lst)
+	(mapcar #'(lambda (x) 
+				(cond ((numberp x) (* x x))
+                      ((atom x) x)
+                      ((atom (cdr x)) (dop-fun x))
+					  ((listp x) (minus-d-all x)))) lst))
+; рекурсия
+(defun f (lst)
+	(cond ((null lst) ())
+	((symbolp (car lst)) (cons (car lst) (f (cdr lst))))
+	((numberp (car lst)) (cons (* (car lst) (car lst)) (f (cdr lst))))
+	((atom (car lst)) (cons (car lst) (f (cdr lst) )))
+    ((atom (cdr lst)) (cons (dop-fun (car lst)) (f (cdr lst) )))
+	(T (cons (f (car lst)) (f (cdr lst))))) )
 
-(defun get-sqr-list-fun (lst)
-    (mapcan #'get-sqr-helper lst))
+; "хвостовая" рекурсия
+(defun f (lst res)
+	(cond ((null lst) (reverse res))
+	    ((symbolp (car lst)) (f (cdr lst) (cons (car lst) res)))
+	    ((numberp (car lst)) (f (cdr lst) (cons (* (car lst) (car lst)) res)))
+        ((atom (car lst)) (f (cdr lst) (cons (car lst) res)))
+        ((atom (cdr lst)) (f (cdr lst) (cons (dop-fun (car lst)) res)))
+	    (T (f (cdr lst) (cons (f (csr lst) ()) res))) ) )
+
 
 ; 6. Напишите функцию, select-between, которая из списка-аргумента, содержащего только числа, 
 ; выбирает только те, которые расположены между двумя указанными границами-аргументами
 ; и возвращает их в виде списка (упорядоченного по возрастанию списка чисел (+ 2 балла)).
 
-;
 (defun bubble_move (lst)
     (cond ((atom (cdr lst)) lst)
           ((> (car lst) (cadr lst)) (cons (cadr lst) (bubble_move (cons (car lst) (cddr lst)))))
@@ -187,29 +254,6 @@
 	(remove-if #'(lambda (x) (null x))
 		(mapcar #'(lambda (x) (if (< left x right) x)) lst))
 )
-
-
-; (defun find-min (lst)
-; 	(setf temp (car lst))
-; 	(mapcar #'(lambda (x)
-; 				(if (> temp x)
-; 					(setf temp x))) lst)
-; 	temp
-; )
-
-; (defun set-element (new old lst)
-; 	(cond ((= (car lst) old) (rplaca lst new))
-; 		  (t (set-element new old (cdr lst))))
-; 	lst
-; )
-
-; (defun my-sort (lst)
-; 	(maplist #'(lambda (x)
-; 					(and (setf temp (find-min x))
-; 						 (set-element (car x) temp x)
-; 						 (rplaca x temp))) lst)		 
-; 	lst
-; )
 
 (defun select-between (lst b1 b2)
 	(cond ((null lst) nil)
@@ -229,36 +273,8 @@
             (>= (car lst) a)) 
             (select-rec-one-lvl (cdr lst) a b (cons (car lst) res)))
         (t (select-rec-one-lvl (cdr lst) a b res))))
-
-; Рекурсивно. Для смешанного структурированного списка. &&&&&&&&&&&&
-(defun select-rec (lst a b res)
-    (cond
-        ((null lst) res)
-        ((listp (car lst)) (cons (select-rec (car lst) a b res)
-                                 (select-rec (cdr lst) a b res)))
-        ((and
-            (numberp (car lst))
-            (<= (car lst) b) 
-            (>= (car lst) a)) 
-            (select-rec (cdr lst) a b (cons (car lst) res)))
-        (t (select-rec (cdr lst) a b res))))
-; (select-rec '(1 2 (3 4 #'+ 3) ad 3 2 zxcv) 1 3)
-
-; С использованием функционала. Для смешанного списка.
-(defun select-fun-one-lvl (lst a b)
-    (remove-if-not #'(lambda (el) (and (numberp el) (<= el b) (>= el a))) lst))
-
-; С использованием функционала. Для смешанного структурированного списка.
-(defun select-fun (lst a b)
-    (mapcan #'(lambda (el) (cond
-            ((listp el) (select-fun el a b))
-            ((and (numberp el) (<= el b) (>= el a) (cons el nil))))) lst))
-
-; обёрточная функция для каждой из предоставленной выше функции
-(defun select-between (lst fNum sNum)
-    (let ((a (cond ((< fNum sNum) fNum) (t sNum)))
-          (b (cond ((< fNum sNum) sNum) (t fNum))))
-          (select-rec lst a b ())))
+(defun select-between (lst)
+    (select-rec lst 1 10 ()))
 
 
 ; 7. Написать функцию, вычисляющую декартово произведение двух своих списковаргументов. 
@@ -268,8 +284,7 @@
 (defun decart (lstx lsty)
 	(mapcan #'(lambda (x)
 		(mapcar #'(lambda (y)
-			(list x y)) lsty)) lstx)
-)
+			(list x y)) lsty)) lstx))
 
 ; рекурсия без накапливаний cons
 (defun decart-rec (el lst2 res)
@@ -300,6 +315,11 @@
 ; вычисляет сумму длин всех элементов list-of-list, т.е. например для аргумента  
 ; ((1 2) (3 4)) -> 4.
 
+; функционал
+(defun list-of-list (lst)
+	(reduce #'(lambda (acc lst) (+ acc (length lst)))
+		(cons 0 lst)))
+		
 (defun my-length-rec (lst n)
 	(cond 
 	((null lst) n)

@@ -23,6 +23,7 @@
 ; 4 Написать функцию, которая выбирает из заданного 
 ; списка только те числа, которые больше 1 и меньше 10. 
 ; (Вариант: между двумя заданными границами. )
+
 ; рекурсивно для од. списка
 (defun select-rec-one-lvl (lst a b res)
     (cond 
@@ -64,39 +65,50 @@
 
 ; +7  Напишите рекурсивную функцию, которая умножает на заданное 
 ; число-аргумент все числа из заданного списка-аргумента, когда
-; С использованием функционала для одномерного смешанного списка
-(defun mult-els (lst num)
-    (mapcar #'(lambda (arg) (cond 
-                ((numberp arg) (* arg num))
-                (t arg))) 
-        lst))
+; одноуровневыq список
+; только числа
+(defun f (lst num res)
+	(cond ((null lst) (reverse res))
+	(T (f (cdr lst) (cons (* (car lst) num) res))) ) )
 
-; С использованием функционала для структурированного смешанного списка
-(defun mult-els-deep (lst num)
-    (mapcar #'(lambda (arg) 
-            (cond 
-                ((listp arg) (mult-els-deep arg num))
-                ((numberp arg) (* arg num))
-                (t arg))) lst))
+; смешанный список
+(defun f (lst num res)
+	(cond ((null lst) (reverse res))
+          ((numberp (car lst)) (f (cdr lst) (cons (* (car lst) num) res)))
+	      (T (f (cdr lst) (cons (car lst) res))) ) )
 
-; Рекурсивно для одномерного смешанного списка
-(defun mult-els-rec (lst num res)
-    (cond 
-        ((null lst) (reverse res)
-        ((numberp (car lst)) (mult-els-rec (cdr lst) num (cons (* (car lst) num) res )))
-        (t (mult-els-rec (cdr lst) num (cons (car lst) res)))))
+(defun my-mult (lst num)
+    (f lst num ()))
 
-(defun mult-els (lst num)
-    (mult-els-rec (lst num ())))
+; структурированный список
+; вспомогательная функция
+(defun dop-fun (lst num)
+    (cond ((and (numberp (car lst)) (numberp (cdr lst))) (cons (* (car lst) num) (* (cdr lst) num)))
+          ((and (symbolp (car lst)) (numberp (cdr lst))) (cons (car lst) (* (cdr lst) num)))
+          ((and (numberp (car lst)) (symbolp (cdr lst))) (cons (* (car lst) num) (cdr lst)))
+          ((and (atom (cdar lst)) (numberp (cdr lst))) (cons (dop-fun (car lst)) (* (cdr lst) num)))
+          ((and (atom (cdar lst)) (symbolp (cdr lst))) (cons (dop-fun (car lst)) (cdr lst)))
+          (T lst)))
 
-; Рекурсивно для структурированного смешанного  списка &&&&&&&&&
-(defun mult-els-rec-deep (lst num)
-    (cond
-        ((null lst) nil)
-        ((listp (car lst)) (cons (mult-els-rec-deep (car lst) num) (mult-els-rec-deep (cdr lst) num)))
-        ((numberp (car lst)) (cons (* (car lst) num) (mult-els-rec-deep (cdr lst) num)))
-        (t (cons (car lst) (mult-els-rec-deep (cdr lst) num)))))
+; рекурсия
+(defun f (lst)
+	(cond ((null lst) ())
+	((symbolp (car lst)) (cons (car lst) (f (cdr lst))))
+	((numberp (car lst)) (cons (* (car lst) num) (f (cdr lst))))
+	((atom (car lst)) (cons (car lst) (f (cdr lst) )))
+    ((atom (cdr lst)) (cons (dop-fun (car lst)) (f (cdr lst) )))
+	(T (cons (f (car lst)) (f (cdr lst))))) )
 
+; "хвостовая" рекурсия
+(defun f (lst res)
+	(cond ((null lst) (reverse res))
+	    ((symbolp (car lst)) (f (cdr lst) (cons (car lst) res)))
+	    ((numberp (car lst)) (f (cdr lst) (cons (* (car lst) num) res)))
+        ((atom (car lst)) (f (cdr lst) (cons (car lst) res)))
+        ((atom (cdr lst)) (f (cdr lst) (cons (dop-fun (car lst)) res)))
+	    (T (f (cdr lst) (cons (f (csr lst) ()) res))) ) )
+
+    
 ; 8  Напишите функцию, select-between, которая из списка-аргумента, 
 ; содержащего только числа, выбирает только те, которые расположены
 ; между двумя указанными границамиаргументами и возвращает их в виде
@@ -112,29 +124,9 @@
             (select-rec-one-lvl (cdr lst) a b (cons (car lst) res)))
         (t (select-rec-one-lvl (cdr lst) a b res))))
 
-; Рекурсивно. Для смешанного структурированного списка. &&&&&&&&&&&&
-(defun select-rec (lst a b res)
-    (cond
-        ((null lst) res)
-        ((listp (car lst)) (cons (select-rec (car lst) a b res)
-                                 (select-rec (cdr lst) a b res)))
-        ((and
-            (numberp (car lst))
-            (<= (car lst) b) 
-            (>= (car lst) a)) 
-            (select-rec (cdr lst) a b (cons (car lst) res)))
-        (t (select-rec (cdr lst) a b res))))
-; (select-rec '(1 2 (3 4 #'+ 3) ad 3 2 zxcv) 1 3)
-
 ; С использованием функционала. Для смешанного списка.
 (defun select-fun-one-lvl (lst a b)
     (remove-if-not #'(lambda (el) (and (numberp el) (<= el b) (>= el a))) lst))
-
-; С использованием функционала. Для смешанного структурированного списка.
-(defun select-fun (lst a b)
-    (mapcan #'(lambda (el) (cond
-            ((listp el) (select-fun el a b))
-            ((and (numberp el) (<= el b) (>= el a) (cons el nil))))) lst))
 
 ; обёрточная функция для каждой из предоставленной выше функции
 (defun select-between (lst fNum sNum)
@@ -251,12 +243,3 @@
         ((null lst) (reverse res))
 		((symbolp (car lst)) (get-sqr-list (cdr lst) (cons (car lst) res)))
         ((numberp (car lst)) (get-sqr-list (cdr lst) (cons (* (car lst) (car lst)) res)))))
-
-; Рекурсивно для смешанного структурированного списка &&&&&&&&&&&&
-(defun get-sqr-list (lst)
-    (cond 
-        ((null lst) nil)
-		((symbolp (car lst)) (cons (car lst) (get-sqr-list (cdr lst))))
-        ((listp (car lst)) (cons (get-sqr-list (car lst)) (get-sqr-list (cdr lst))))
-        ((numberp (car lst)) (cons (* (car lst) (car lst)) (get-sqr-list (cdr lst))))
-        (t (get-sqr-list (cdr lst)))))
