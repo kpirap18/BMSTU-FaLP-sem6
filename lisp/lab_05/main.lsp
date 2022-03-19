@@ -68,10 +68,10 @@
 (defun task (lst p q)
   (cond ((= p q) lst)
         ((> p q) (task lst q p))
-        (t  (let* ((ls (length lst))
+        (t  (let* ((l (length lst))
                   (l (cut-list lst 1 (- p 1)))
                   (m (cut-list lst p (- q p)))
-                  (r (cut-list lst q (- ls q -1))))
+                  (r (cut-list lst q (- l q -1))))
             (append l (list (car r)) (cdr m) (list (car m)) (cdr r))))))
 
 
