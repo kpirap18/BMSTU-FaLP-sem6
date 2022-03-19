@@ -36,17 +36,17 @@
         (t (select-rec-one-lvl (cdr lst) a b res))))
 
 ; Рекурсивно. Для смешанного структурированного списка.
-(defun select-rec (lst a b res)
+(defun select-rec (lst a b)
     (cond
-        ((null lst) res)
-        ((listp (car lst)) (cons (select-rec (car lst) a b res)
-                                 (select-rec (cdr lst) a b res)))
+        ((null lst) nil)
+        ((listp (car lst)) (cons (select-rec (car lst) a b)
+                                 (select-rec (cdr lst) a b)))
         ((and
             (numberp (car lst))
             (<= (car lst) b) 
             (>= (car lst) a)) 
-            (select-rec (cdr lst) a b (cons (car lst) res)))
-        (t (select-rec (cdr lst) a b res))))
+                (cons (car lst) (select-rec (cdr lst) a b)))
+        (t (select-rec (cdr lst) a b))))
 
 ; С использованием функционала. Для смешанного списка.
 (defun select-fun-one-lvl (lst a b)
@@ -61,7 +61,7 @@
 
 ; обёрточная функция для каждой из предоставленной выше функции
 (defun select-between (lst)
-    (select-rec lst 1 10 ()))
+    (select-fun lst 1 10 ()))
 
 ; +7  Напишите рекурсивную функцию, которая умножает на заданное 
 ; число-аргумент все числа из заданного списка-аргумента, когда
@@ -154,10 +154,9 @@
 ; с обработкой смешанных структурированных списков
 (defun rec-add-inner (lst acc)
     (cond
-        ((null lst) acc)
-        ((listp (car lst)) (rec-add-inner (cdr lst) (rec-add-inner (car lst) acc )))
-        ((numberp (car lst)) (rec-add-inner (cdr lst) (+ acc (car lst))))
-        (t (rec-add-inner (cdr lst) acc))))
+        ((numberp lst) (+ acc lst))
+        ((or (null lst) (symbolp lst))acc)
+        (t (rec-add-inner (cdr lst) (rec-add-inner (car lst) acc )))))
 
 (defun rec-add (lst)
     (rec-add-inner lst 0))
@@ -215,7 +214,8 @@
 
 (defun my-odd-rec (lst)
 	(cond ((null lst) Nil)
-          ((oddp (car lst)) (car lst))
+          ((and (numberp (car lst)) (oddp (car lst))) (car lst))
+          ((listp (car lst)) (my-odd-rec (car lst)))
 	      (T (my-odd-rec (cdr lst))) ))
 
 

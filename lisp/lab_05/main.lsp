@@ -130,3 +130,14 @@
 		  ((> b1 b2)(my-sort (find-elements lst b2 b1)))
 		  ((> b2 b1)(my-sort (find-elements lst b1 b2))))
 )
+
+
+
+(defun s-t-l (lst)
+(reduce #'(lambda (tmp res) (cons tmp res)) (cdr lst):initial-value (list (car lst)):from-end t))
+
+
+
+(defun f-b-f (v lst)
+(find-if (lambda (x) (not (null x)))
+   (mapcar (lambda (p) (cond ((eql (car p) v) (cdr p)) (eql (cdr p) v) (car p)))) lst))

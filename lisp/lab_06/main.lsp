@@ -52,6 +52,15 @@
     ((atom (cdr lst)) (cons (dop-fun (car lst)) (f (cdr lst) )))
 	(T (cons (f (car lst)) (f (cdr lst))))) )
 
+	; рекурсия
+(defun f (lst)
+	(cond ((null lst) ())
+	((symbolp lst) lst)
+	((numberp lst) ( - lst 10 ))
+	((symbolp (car lst)) (cons (car lst) (f (cdr lst))))
+	((numberp (car lst)) (cons (- (car lst) 10) (f (cdr lst))))
+	(T (cons (f (car lst)) (f (cdr lst))))) )
+
 ; "хвостовая" рекурсия
 (defun f (lst res)
 	(cond ((null lst) (reverse res))
@@ -127,8 +136,8 @@
 ; 3. Написать функцию, которая по своему списку-аргументу lst определяет 
 ; является ли он палиндромом (то есть равны ли lst и (reverse lst)).
 (defun palindrome-p (list)
-  (let* ((length (length list))
-         (half-length (ceiling length 2))
+  (let* ((length1 (length list))
+         (half-length (ceiling length1 2))
          (tail (nthcdr half-length list))
          (reversed-head (nreverse (butlast list half-length))))
     (equal tail reversed-head)))
