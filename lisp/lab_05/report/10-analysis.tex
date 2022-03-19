@@ -1,11 +1,11 @@
 \section*{Практические вопросы}
 
 
-<<<<<<< Updated upstream
+
 \subsubsection*{1. Написать функцию, которая по своему списку-аргументу lst определяет является ли он палиндромом (то есть равны ли lst и (reverse lst)).}
-=======
+
 %\subsubsection*{1.}
->>>>>>> Stashed changes
+
 \begin{lstlisting}[language=Lisp]
 (defun palindrome-p (list)
 	(let* ((length (length list))
@@ -13,7 +13,7 @@
 		(tail (nthcdr half-length list))
 		(reversed-head (nreverse (butlast list half-length))))
 		(equal tail reversed-head)))
-<<<<<<< Updated upstream
+
 
 (defun is-palindrome-2 (lst)
 	(equalp lst (reverse lst)))
@@ -22,18 +22,17 @@
 
 \subsubsection*{2. Написать предикат set-equal, который возвращает t, если два его множествааргумента содержат одни и те же элементы, порядок которых не имеет значения}
 
-=======
-\end{lstlisting}
+
+
 
 %\subsubsection*{2.}
->>>>>>> Stashed changes
+
 \begin{lstlisting}[language=Lisp]
 (defun my-subsetp (set1 set2)
 	(reduce
 		#'(lambda (acc1 set1-el)
 			(and acc1 (reduce
 				#'(lambda (acc2 set2-el)
-<<<<<<< Updated upstream
 					(or acc2 (= set2-el set1-el))) 
 				set2 :initial-value Nil)))
 	set1 :initial-value T))
@@ -51,7 +50,7 @@
 	(cond ((null table) nil)
 		((equal key (caar table)) (cdar table))
 		(T (my-assoc key (cdr table))))))
-=======
+
 					(or acc2 (= set2-el set1-el))) set2 :initial-value Nil)))
 	set1 :initial-value T))
 
@@ -69,7 +68,7 @@
 	(cond ((null table) nil)
 		((equal val (caar table)) (cdar table))
 		(T (my-rassoc val (cdr table)))))
->>>>>>> Stashed changes
+
 
 ; страну
 (defun my-rassoc (val table)
@@ -83,23 +82,22 @@
 
 (defun find-country (key table)
 	(car (rassoc key table)))
-<<<<<<< Updated upstream
+
 \end{lstlisting}
 
 \subsubsection*{4. Напишите функцию swap-first-last, которая переставляет в списке-аргументе первый и последний элементы.}
-=======
 
-\end{lstlisting}
+
 
 
 %\subsubsection*{4.}
->>>>>>> Stashed changes
+
 \begin{lstlisting}[language=Lisp]
 (defun f1 (lst)
 	(reverse (cdr (reverse lst))) )
 
 (defun swap-first-last (lst)
-<<<<<<< Updated upstream
+
 	(append (append (last lst) (cdr (f1 lst))) 
 			(cons (car lst) Nil)) )
 
@@ -130,25 +128,19 @@
 \end{lstlisting}
 
 \subsubsection*{6. Напишите две функции, swap-to-left и swap-to-right, которые производят одну круговую перестановку в списке-аргументе влево и вправо, соответственно.}
-=======
-	(append (append (last lst) (cdr (f1 lst))) (cons (car lst) Nil)) )
 
-(defun swap-first-last2 (lst)
-	(append (append (last lst) (butlast (cdr lst) 1)) (cons (car lst) Nil))) )
-
-\end{lstlisting}
 
 
 
 %\subsubsection*{6.}
->>>>>>> Stashed changes
+
 \begin{lstlisting}[language=Lisp]
 (defun rot-left(n l)
 	(append (nthcdr n l) (butlast l (- (length l) n))))
 
 (defun rot-right(n l)
 	(rot-left (- (length l) n) l))
-<<<<<<< Updated upstream
+
 \end{lstlisting}
 
 
@@ -181,6 +173,5 @@
 		((> b1 b2)(my-sort (find-elements lst b2 b1)))
 		((> b2 b1)(my-sort (find-elements lst b1 b2)))))
 \end{lstlisting}
-=======
-\end{lstlisting}
->>>>>>> Stashed changes
+
+
